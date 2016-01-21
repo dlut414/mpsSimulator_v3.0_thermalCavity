@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\REN">
+      <UniqueIdentifier>{df647bbb-7c6a-44ed-b895-924cd01e088c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\REN\Shaders">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\SIM">
+      <UniqueIdentifier>{fb439094-33fd-4bcc-8390-ea4995b7f55f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\REN\Shaders\shader0">
+      <UniqueIdentifier>{ab53b23f-9f31-4e13-9c3a-6ce226796850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SIM\Simulator">
+      <UniqueIdentifier>{2cb19bc6-d97b-4390-ac36-51a427dfd712}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SIM\Particle">
+      <UniqueIdentifier>{5800640c-b014-4332-a956-8a00a9f6579b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="renderer\Camera.h">
+      <Filter>Header Files\REN</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\Header.h">
+      <Filter>Header Files\REN</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\Renderer.h">
+      <Filter>Header Files\REN</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\Shader.h">
+      <Filter>Header Files\REN</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\Controller.h">
+      <Filter>Header Files\REN</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\DrawSim.h">
+      <Filter>Header Files\REN</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\Draw_.h">
+      <Filter>Header Files\REN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle.h">
+      <Filter>Header Files\SIM\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Simulator.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConsValue.h">
+      <Filter>Header Files\SIM\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BgPart.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LinkCell.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MatSolver.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Parameter.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sensor.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shifter.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle_2d_i.h">
+      <Filter>Header Files\SIM\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle_2d_i_cst.h">
+      <Filter>Header Files\SIM\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle_2d_j.h">
+      <Filter>Header Files\SIM\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle_x.h">
+      <Filter>Header Files\SIM\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mls_2d_i.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mls_2d_i_cst.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mls_2d_i_euler.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mls_2d_j.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mls_2d_j_euler.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mMath.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\_Polynomial.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Polynomial.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Derivative.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Header.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FractionalStep_x.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FractionalStep_x_cst.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle_x_cst.h">
+      <Filter>Header Files\SIM\Particle</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="renderer\shader0\fragment.glsl">
+      <Filter>Header Files\REN\Shaders\shader0</Filter>
+    </None>
+    <None Include="renderer\shader0\vertex.glsl">
+      <Filter>Header Files\REN\Shaders\shader0</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mpsSimulator_v3.0.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

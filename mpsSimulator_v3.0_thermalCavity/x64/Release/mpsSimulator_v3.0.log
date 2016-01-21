@@ -1,0 +1,15 @@
+﻿Build started 2016/01/21 17:51:12.
+     1>Project "C:\Users\HU FANGYUAN\Documents\Visual Studio 2013\Projects\mpsSimulator_v3.0_thermalCavity\mpsSimulator_v3.0_thermalCavity\mpsSimulator_v3.0.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Isrc /I..\common /I"..\..\extern\freeglut-2.8.1\include" /I"..\..\extern\glew-1.11.0\include" /I..\..\extern\glm /I..\..\extern\eigen /Zi /nologo /W3 /WX- /sdl /MP /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /openmp /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt mpsSimulator_v3.0.cpp
+         mpsSimulator_v3.0.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\HU FANGYUAN\Documents\Visual Studio 2013\Projects\mpsSimulator_v3.0_thermalCavity\x64\Release\mpsSimulator_v3.0_thermalCavity.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"..\..\extern\freeglut-2.8.1\lib\x64" /LIBPATH:"..\..\extern\glew-1.11.0\lib\Release\x64" glew32.lib freeglut.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\HU FANGYUAN\Documents\Visual Studio 2013\Projects\mpsSimulator_v3.0_thermalCavity\x64\Release\mpsSimulator_v3.0_thermalCavity.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\HU FANGYUAN\Documents\Visual Studio 2013\Projects\mpsSimulator_v3.0_thermalCavity\x64\Release\mpsSimulator_v3.0_thermalCavity.lib" /MACHINE:X64 x64\Release\mpsSimulator_v3.0.obj
+         Generating code
+         Finished generating code
+         mpsSimulator_v3.0.vcxproj -> C:\Users\HU FANGYUAN\Documents\Visual Studio 2013\Projects\mpsSimulator_v3.0_thermalCavity\x64\Release\mpsSimulator_v3.0_thermalCavity.exe
+     1>Done Building Project "C:\Users\HU FANGYUAN\Documents\Visual Studio 2013\Projects\mpsSimulator_v3.0_thermalCavity\mpsSimulator_v3.0_thermalCavity\mpsSimulator_v3.0.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:12.94

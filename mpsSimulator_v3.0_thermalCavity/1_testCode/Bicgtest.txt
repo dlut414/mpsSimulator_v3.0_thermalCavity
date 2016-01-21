@@ -1,0 +1,27 @@
+	typedef Eigen::Triplet<double> tpl;
+	std::vector<tpl> coef; coef.clear();
+	Eigen::SparseMatrix<double> a(3, 3);
+	Eigen::Matrix<double, 3, 1> x, b;
+	Eigen::BiCGSTAB< Eigen::SparseMatrix<double> > solver;
+	coef.push_back(tpl(0, 0, 1.e-9));
+	coef.push_back(tpl(0, 1, 1.));
+	coef.push_back(tpl(0, 2, 1.e-9));
+	coef.push_back(tpl(1, 0, 1.));
+	coef.push_back(tpl(1, 1, 1.));
+	coef.push_back(tpl(2, 2, 1.));
+	a.setFromTriplets(coef.begin(), coef.end());
+	solver.setMaxIterations(1000);
+	solver.setTolerance(1.e-10);
+	b[0] = 1.e4+1; b[1] = 1.e9+1.e4; b[2] = 1.;
+	solver.compute(a);
+	x[0] = 1.; x[1] = 0.;
+	x = solver.solveWithGuess(b, x);
+	std::cout << " here : " << std::endl;
+	std::cout << x << std::endl;
+	std::cout << " error: " << solver.error() << std::endl;
+	std::cout << " itera: " << solver.iterations() << std::endl;
+
+	typedef Eigen::Matrix<double, 2, 2> matEi;
+	Eigen::SelfAdjointEigenSolver<matEi> sol(a);
+	Eigen::Matrix<double, 2, 1> eig = sol.eigenvalues();
+	std::cout << eig << std::endl;

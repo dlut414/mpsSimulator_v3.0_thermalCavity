@@ -1,0 +1,9 @@
+			for (unsigned p = 0; p < part->np; p++) {
+				if (part->type[p] == BD2) continue;
+				if (part->isFs(p)) {part->pres[p] = 0.; continue;}
+				part->pres[p] = (0.25-part->pos[p].z)*9000;
+			}
+			unsigned i = 1996;
+			vec tmp = part->grad_suzuki(part->pres, i);
+			std::cout << " " << part->pres[i] << " " << tmp.x << " " << tmp.z << std::endl;
+			part->pres[i] = 1e5;
