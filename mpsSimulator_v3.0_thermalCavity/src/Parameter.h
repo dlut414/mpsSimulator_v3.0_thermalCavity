@@ -14,19 +14,19 @@ namespace SIM {
 
 	public:
 		R k;		//radius k*dp
-		R rho;	//density
-		R niu;	//kinetic viscosity
-		R dtMax;	//max time step
-		R cfl;	//cfl num
-		R tt;	//total time
-		R eps;	//eps
-		R beta;	//beta: free surface
-		R alpha;	//particle shifting
-		R c;		//particle shifting
+		R eps;		//eps
+
+		R Pr;		//Prandtl number
+		R Ra;		//Rayleigh number
 		
-		Vec g;		//gravity
-		R dt;	//current time step
-		R umax;	//current umax
+		R cfl;		//cfl num
+		R dtMax;	//max time step
+		R tt;		//total time
+		R dt;		//current time step
+		R umax;		//current umax
+
+		R alpha;	//arbitrary parameter
+		R beta;		//arbitrary parameter
 	private:
 		void init() {
 			dt = 1.;

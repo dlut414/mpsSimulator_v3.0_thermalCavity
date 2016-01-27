@@ -23,23 +23,24 @@ namespace SIM {
 			calInvMat();
 
 			visTerm_i_q2r0();
-			//calPnd();
 			presTerm_i_q2();
+			tempratureTerm_i_q1();
 
 			syncPos();
-			convect_q2r0s2();
+			updateVelocity_q2r0();
+			updatePosition_s2();
 
 			calInvMat();
 			calForVis();
 			check();
 
-			calCell(); //update cells
+			calCell();
 			calInvMat();
 			shift();
 
 			sync();
 
-			if (timeStep % 100 == 0) profileOut_avgVel2();
+			//if (timeStep % 100 == 0) profileOut_avgVel2();
 			//calInvMat(); //for sensor
 			//profileOut();
 			//sensorOut();
@@ -89,7 +90,13 @@ namespace SIM {
 			solvMat_phi();
 		}
 
-		void convect_q2r1s2() {
+		void tempratureTerm_i_q1() {
+			makeLhs_t();
+			makeRhs_t_q1();
+			solvMat_t();
+		}
+
+		void updateVelocity_q2r1() {
 			const auto coefL = (2.* para.dt) / (3.* para.rho);
 			const auto miu = para.rho * para.niu;
 #if OMP
@@ -107,15 +114,9 @@ namespace SIM {
 			for (int p = 0; p < int(part->np); p++) {
 				if (part->type[p] == FLUID) part->vel2[p] += -coefL* part->grad(part->phi, p);
 			}
-#if OMP
-#pragma omp parallel for
-#endif
-			for (int p = 0; p < int(part->np); p++) {
-				if (part->type[p] == FLUID) part->pos[p] += 0.5* para.dt * (3.*part->vel1[p] - 1.* part->vel_m1[p]);
-			}
 		}
 
-		void convect_q1r0s1() {
+		void updateVelocity_q1r0() {
 			const auto coefL = para.dt / para.rho;
 			const auto miu = para.rho * para.niu;
 #if OMP
@@ -133,15 +134,9 @@ namespace SIM {
 			for (int p = 0; p < int(part->np); p++) {
 				if (part->type[p] == FLUID) part->vel2[p] += -coefL * part->grad(part->phi, p);
 			}
-#if OMP
-#pragma omp parallel for
-#endif
-			for (int p = 0; p < int(part->np); p++) {
-				if (part->type[p] == FLUID) part->pos[p] += 0.5* para.dt * (part->vel1[p] + part->vel2[p]);
-			}
 		}
 
-		void convect_q2r0s1() {
+		void updateVelocity_q2r0() {
 			const auto coefL = (2.* para.dt) / (3.* para.rho);
 			const auto miu = para.rho * para.niu;
 #if OMP
@@ -159,6 +154,9 @@ namespace SIM {
 			for (int p = 0; p < int(part->np); p++) {
 				if (part->type[p] == FLUID) part->vel2[p] += -coefL* part->grad(part->phi, p);
 			}
+		}
+
+		void updatePosition_s1() {
 #if OMP
 #pragma omp parallel for
 #endif
@@ -167,24 +165,7 @@ namespace SIM {
 			}
 		}
 
-		void convect_q2r0s2() {
-			const auto coefL = (2.* para.dt) / (3.* para.rho);
-			const auto miu = para.rho * para.niu;
-#if OMP
-#pragma omp parallel for
-#endif
-			for (int p = 0; p < int(part->np); p++) {
-				if (part->type[p] == FLUID || part->type[p] == BD1) {
-					part->pres[p] = part->phi[p] - miu* part->div(part->vel2, p);
-				}
-				else if (part->type[p] == BD2) part->pres[p] = part->phi[p];
-			}
-#if OMP
-#pragma omp parallel for
-#endif
-			for (int p = 0; p < int(part->np); p++) {
-				if (part->type[p] == FLUID) part->vel2[p] += -coefL* part->grad(part->phi, p);
-			}
+		void updatePosition_s2() {
 #if OMP
 #pragma omp parallel for
 #endif
@@ -265,18 +246,18 @@ namespace SIM {
 				}
 				auto pp = 0.;
 				const auto& mm = part->invMat[p];
-				const auto& c = part->cell->iCoord(part->pos[p]);
+				const auto& cell = part->cell;
+				const auto c = cell->iCoord(part->pos[p]);
 				for (auto i = 0; i < cell->blockSize::value; i++) {
 					const auto key = cell->hash(c, i);
-					for (auto m = 0; m < part->cell->linkList[key].size(); m++) {
-						const auto q = part->cell->linkList[key][m];
+					for (auto m = 0; m < cell->linkList[key].size(); m++) {
+						const auto q = cell->linkList[key][m];
 #if BD_OPT
 						if (part->bdOpt(p, q)) continue;
 #endif
 						const auto dr = part->pos[q] - part->pos[p];
 						const auto dr1 = dr.mag();
 						if (dr1 > part->r0) continue;
-						if (q == p) continue;
 						const auto w = part->w3(dr1);
 						VecP npq;
 						part->poly(dr, npq);
@@ -284,6 +265,7 @@ namespace SIM {
 						const auto& lp = part->pn_lap_o;
 						const auto pq = -para.niu* lp.dot(a);
 						pp -= pq;
+						if (q == p) continue;
 						for (auto d = 0; d < D; d++) {
 							coef.push_back(Tpl(D*p + d, D*q + d, pq));
 						}
@@ -297,7 +279,6 @@ namespace SIM {
 			mSol->au.setFromTriplets(coef.begin(), coef.end());
 		}
 
-
 		__forceinline void makeRhs_v_q2r1() {
 #if OMP
 #pragma omp parallel for
@@ -305,7 +286,7 @@ namespace SIM {
 			for (int p = 0; p < int(part->np); p++) {
 				if (part->type[p] == BD1 || part->type[p] == BD2) {
 					for (auto d = 0; d < D; d++) {
-						mSol->rhs[d*p + d] = part->vel1[p][d];
+						mSol->rhs[D*p + d] = part->vel1[p][d];
 					}
 					continue;
 				}
@@ -314,7 +295,7 @@ namespace SIM {
 					- (1. / para.rho)* gd
 					+ para.g;
 				for (auto d = 0; d < D; d++) {
-					mSol->rhs[d*p + d] = part->rhs[d];
+					mSol->rhs[D*p + d] = rhs[d];
 				}
 			}
 		}
@@ -326,13 +307,13 @@ namespace SIM {
 			for (int p = 0; p < int(part->np); p++) {
 				if (part->type[p] == BD1 || part->type[p] == BD2) {
 					for (auto d = 0; d < D; d++) {
-						mSol->rhs[d*p + d] = part->vel1[p][d];
+						mSol->rhs[D*p + d] = part->vel1[p][d];
 					}
 					continue;
 				}
 				const auto rhs = (1. / para.dt)* part->vel1[p] + para.g;
 				for (auto d = 0; d < D; d++) {
-					mSol->rhs[d*p + d] = part->rhs[d];
+					mSol->rhs[D*p + d] = rhs[d];
 				}
 			}
 		}
@@ -455,6 +436,81 @@ namespace SIM {
 					inner.block<D, 1>(0, 0) = part->bdnorm.at(p);
 					const auto a = part->invMat[p] * inner;
 					const auto cst = part->neumann.at(p)*part->w3(0.)* ((1. / part->varrho) * part->pn_lap_o) * (a);
+					mSol->b[p] -= cst;
+				}
+			}
+		}
+
+		__forceinline void makeLhs_t() {
+			coef.clear();
+			for (unsigned p = 0; p < part->np; p++) {
+				if (part->type[p] == BD2) {
+					coef.push_back(Tpl(p, p, 1.));
+					continue;
+				}
+				if (part->bdc & T_DIRICHLET) {
+					coef.push_back(Tpl(p, p, 1.));
+					continue;
+				}
+				R pqsum = 0.;
+				R pp = 0.;
+				MatPP* mm;
+				if (part->bdc & T_NEUMANN)	mm = &(part->invMat[p]);
+				else						mm = &(part->invNeu[p]);
+				const auto& cell = part->cell;
+				const auto c = cell->iCoord(part->pos[p]);
+				for (auto i = 0; i < cell->blockSize::value; i++) {
+					const auto key = cell->hash(c, i);
+					for (auto m = 0; m < cell->linkList[key].size(); m++) {
+						const auto q = cell->linkList[key][m];
+#if BD_OPT
+						if (part->bdOpt(p, q)) continue;
+#endif
+#if NOBD2
+						if (part->type[q] == BD2) continue;
+#endif
+						const auto dr = part->pos[q] - part->pos[p];
+						const auto dr1 = dr.norm();
+						if (dr1 > part->r0) continue;
+						const auto w = part->w3(dr1);
+						VecP npq;
+						part->poly(dr, npq);
+						const auto a = (*mm) * (w* npq);
+						const auto& lp = part->pn_lap_o;
+						const auto pq = lp.dot(a);
+						pp -= pq;
+						if (q == p) continue;
+						coef.push_back(Tpl(p, q, pq));
+						pqsum += abs(pq);
+					}
+				}
+				pp += -(1. / para.dt);
+				coef.push_back(Tpl(p, p, pp));
+				if (pqsum < para.eps) coef.push_back(Tpl(p, p, 1.));
+			}
+			mSol->a.setFromTriplets(coef.begin(), coef.end());
+		}
+
+		__forceinline void makeRhs_t_q1() {
+			const auto coefL = -(1. / para.dt);
+#if OMP
+#pragma omp parallel for
+#endif
+			for (int p = 0; p < int(part->np); p++) {
+				if (part->type[p] == BD2) {
+					mSol->b[p] = 0.;
+					continue;
+				}
+				if (part->bdc & T_DIRICHLET) {
+					mSol->b[p] = part->t_dirichlet.at(p);
+					continue;
+				}
+				mSol->b[p] = coefL * part->temp[p];
+				if (part->bdc & T_NEUMANN) {
+					VecP inner = VecP::Zero();
+					inner.block<D, 1>(0, 0) = part->bdnorm.at(p);
+					const auto a = part->invMat[p] * inner;
+					const auto cst = part->t_neumann.at(p)*part->w3(0.)* ((1. / part->varrho) * part->pn_lap_o) * (a);
 					mSol->b[p] -= cst;
 				}
 			}

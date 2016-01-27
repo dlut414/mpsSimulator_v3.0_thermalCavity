@@ -33,17 +33,16 @@ namespace SIM {
 		void operator << (const std::string& str) {
 			std::ifstream file(str);
 			if (!file.is_open()) std::cout << " No file Para. found ! " << std::endl;
-			file >> para.k >> para.rho >> para.niu >> para.dtMax >> para.cfl >> para.tt >> para.eps >> para.beta >> para.alpha >> para.c;
+			file >> para.k >> para.Pr >> para.Ra >> para.cfl >> para.dtMax >> para.tt >> para.eps >> para.alpha >> para.beta;
 			std::cout << " Effective radius (times of dp)   : " << para.k << std::endl;
-			std::cout << " Density (kg/m3)                  : " << para.rho << std::endl;
-			std::cout << " Kinematic viscosity (m2/s)       : " << para.niu << std::endl;
-			std::cout << " Maximum time step (s)            : " << para.dtMax << std::endl;
+			std::cout << " Prandtl number				    : " << para.Pr << std::endl;
+			std::cout << " Rayleigh number				    : " << para.Ra << std::endl;
 			std::cout << " CFL number                       : " << para.cfl << std::endl;
-			std::cout << " Total time (s)                   : " << para.tt << std::endl;
+			std::cout << " Maximum time step (1)            : " << para.dtMax << std::endl;
+			std::cout << " Total time (1)                   : " << para.tt << std::endl;
 			std::cout << " EPS                              : " << para.eps << std::endl;
-			std::cout << " Beta of surface detection        : " << para.beta << std::endl;
-			std::cout << " Re-meshing effective radius      : " << para.alpha << std::endl;
-			std::cout << " Scaling of re-meshing strength   : " << para.c << std::endl;
+			std::cout << " Arbitrary parameter Alpha	    : " << para.alpha << std::endl;
+			std::cout << " Arbitrary parameter Beta	        : " << para.beta << std::endl;
 			std::cout << " Reading Para. done " << std::endl;
 			file.close();
 		}
@@ -239,6 +238,17 @@ namespace SIM {
 				for (auto d = 0; d < D; d++) {
 					part->vel2[p][d] = mSol->u[D*p + d];
 				}
+			}
+		}
+
+		void solvMat_t() {
+			mSol->biCg();
+			auto* const part = derived().part;
+#if OMP
+#pragma omp parallel for
+#endif
+			for (int p = 0; p < int(part->np); p++) {
+				part->temp[p] = mSol->x[p];
 			}
 		}
 

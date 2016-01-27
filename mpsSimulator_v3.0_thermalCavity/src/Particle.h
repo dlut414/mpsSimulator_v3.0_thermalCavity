@@ -43,8 +43,8 @@ namespace SIM {
 
 		void clean() {
 			type.clear(); pos.clear(); pos_m1.clear(); vel1.clear(); vel2.clear(); vel_m1.clear();
-			pnd.clear(); pres.clear(); pn.clear(); nbd.clear(); fs.clear();
-			team.clear(); phi.clear(); vort.clear(); dash.clear(); norm.clear();
+			temp.clear(); pnd.clear(); pres.clear(); pn.clear(); nbd.clear(); fs.clear();
+			team.clear(); phi.clear(); vort.clear(); norm.clear(); bdc.clear();
 		}
 		void operator >> (const std::string str) const {
 			std::ofstream file(str, std::ofstream::out);
@@ -84,12 +84,11 @@ namespace SIM {
 		void addPart (const pType& t, const vec& p, const vec& v) {
 			type.push_back(t);	pos.push_back(p); pos_m1.push_back(p);
 			vel1.push_back(v);	vel2.push_back(v); vel_m1.push_back(v);
-			pnd.push_back(0.);	pres.push_back(0.);
+			temp.push_back(0.); pnd.push_back(0.);	pres.push_back(0.);
 			pn.push_back(0);	nbd.push_back(0);
 			fs.push_back(0);	team.push_back(0);	
 			phi.push_back(0.); vort.push_back(0.);
-			dash.push_back(vec::Zero());
-			norm.push_back(vec::Zero());
+			norm.push_back(vec::Zero()); bdc.push_back(0);
 		}
 
 		const R cPnd(const unsigned& p) const {
@@ -376,12 +375,13 @@ namespace SIM {
 		std::vector<vec> vel1;
 		std::vector<vec> vel2;
 		std::vector<vec> vel_m1;
-		std::vector<vec> dash;
 		std::vector<vec> norm;
 
+		std::vector<R>	temp;
 		std::vector<R>	pnd;
 		std::vector<R>	pres;
 		std::vector<pType>	type;
+		std::vector<int> bdc;
 		std::vector<R>	pn;
 		std::vector<unsigned> nbd;
 		std::vector<int> fs;
