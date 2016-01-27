@@ -24,7 +24,7 @@ namespace SIM {
 
 			visTerm_i_q2r0();
 			presTerm_i_q2();
-			tempratureTerm_i_q1();
+			temperatureTerm_i_q1();
 
 			syncPos();
 			updateVelocity_q2r0();
@@ -90,7 +90,7 @@ namespace SIM {
 			solvMat_phi();
 		}
 
-		void tempratureTerm_i_q1() {
+		void temperatureTerm_i_q1() {
 			makeLhs_t();
 			makeRhs_t_q1();
 			solvMat_t();
