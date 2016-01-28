@@ -232,10 +232,34 @@ namespace SIM {
 		}
 
 		void b2neumann() {
-			neumann.clear();
+			p_neumann.clear();
+			t_neumann.clear();
 			for (unsigned p = 0; p < np; p++) {
-				if (type[p] != BD1) continue;
-				neumann[p] = 0.;
+				if (IS(bdc[p], P_NEUMANN)) p_neumann[p] = 0.;
+				if (IS(bdc[p], T_NEUMANN)) t_neumann[p] = 0.;
+			}
+		}
+
+		void b2dirichlet() {
+			p_dirichlet.clear();
+			t_dirichlet.clear();
+			for (unsigned p = 0; p < np; p++) {
+				if (IS(bdc[p], P_DIRICHLET)) p_dirichlet[p] = 0.;
+				if (IS(bdc[p], T_DIRICHLET0)) t_dirichlet[p] = 0.;
+				if (IS(bdc[p], T_DIRICHLET1)) t_dirichlet[p] = 1.;
+			}
+		}
+
+		void makeBdc() {
+			for (unsigned p = 0; p < np; p++) {
+				bdc[p] = 0;
+				if (type[p] == BD1) {
+					bdc[p] = ON(bdc[p], P_NEUMANN);
+					if (abs(pos[p][0] - 0.) < eps) bdc[p] = ON(bdc[p], T_DIRICHLET1);
+					if (abs(pos[p][0] - 1.) < eps) bdc[p] = ON(bdc[p], T_DIRICHLET0);
+					if (abs(pos[p][1] - 0.) < eps) bdc[p] = ON(bdc[p], T_NEUMANN);
+					if (abs(pos[p][1] - 1.) < eps) bdc[p] = ON(bdc[p], T_NEUMANN);
+				}
 			}
 		}
 
@@ -388,9 +412,12 @@ namespace SIM {
 		std::vector<int> team;
 		std::vector<R> phi;
 		std::vector<R> vort;
-		std::map<unsigned, vec> bdnorm;
-		std::map<unsigned, R> neumann;
-		std::map<unsigned, unsigned> bbMap;
+		std::unordered_map<unsigned, vec> bdnorm;
+		std::unordered_map<unsigned, R> p_dirichlet;
+		std::unordered_map<unsigned, R> t_dirichlet;
+		std::unordered_map<unsigned, R> p_neumann;
+		std::unordered_map<unsigned, R> t_neumann;
+		std::unordered_map<unsigned, unsigned> bbMap;
 
 		LinkCell<R,D>* cell;
 

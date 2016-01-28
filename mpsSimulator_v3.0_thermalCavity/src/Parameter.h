@@ -30,7 +30,6 @@ namespace SIM {
 	private:
 		void init() {
 			dt = 1.;
-			g = Vec::Zero();
 		}
 	};
 

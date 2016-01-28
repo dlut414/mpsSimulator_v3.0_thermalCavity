@@ -384,6 +384,7 @@ namespace SIM {
 			std::vector<Vec> dp(part->np, Vec::Zero());
 			std::vector<Vec> tmp1(part->np, Vec::Zero());
 			std::vector<Vec> tmp2(part->np, Vec::Zero());
+			std::vector<R> tmp3(part->np, R(0.));
 #if OMP
 #pragma omp parallel for
 #endif
@@ -407,7 +408,7 @@ namespace SIM {
 							if (q == p) continue;
 							const auto dr = dp[q] - dp[p];
 							const auto dr1 = dr.norm();
-							const auto re = part->dp*para.alpha;
+							const auto re = part->dp*para.k;
 							//gc -= w2(dr1, part->r0)* (dr / dr1);
 							if (dr1 > re) continue;
 							const auto ww = w2(dr1, re);
@@ -418,7 +419,7 @@ namespace SIM {
 					//	gc = gc.norm();
 					//	dpq = dpq - 1.*(dpq*gc)*gc;
 					//}
-					dp[p] += para.c* para.umax* para.dt* dpq;
+					dp[p] += para.umax* para.dt* dpq;
 				}
 			}
 #if OMP
@@ -429,6 +430,7 @@ namespace SIM {
 				if (part->isFs(p)) continue;
 				tmp1[p] = part->derived().func_lsA_upwind(part->vel1, p, dp[p]);
 				tmp2[p] = part->derived().func_lsA_upwind(part->vel2, p, dp[p]);
+				tmp3[p] = part->derived().func_lsA_upwind(part->temp, p, dp[p]);
 			}
 #if OMP
 #pragma omp parallel for
@@ -438,6 +440,7 @@ namespace SIM {
 				part->pos[p] = dp[p];
 				part->vel1[p] = tmp1[p];
 				part->vel2[p] = tmp2[p];
+				part->temp[p] = tmp3[p];
 			}
 		}
 

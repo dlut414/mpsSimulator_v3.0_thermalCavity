@@ -35,14 +35,14 @@ namespace SIM {
 			if (!file.is_open()) std::cout << " No file Para. found ! " << std::endl;
 			file >> para.k >> para.Pr >> para.Ra >> para.cfl >> para.dtMax >> para.tt >> para.eps >> para.alpha >> para.beta;
 			std::cout << " Effective radius (times of dp)   : " << para.k << std::endl;
-			std::cout << " Prandtl number				    : " << para.Pr << std::endl;
-			std::cout << " Rayleigh number				    : " << para.Ra << std::endl;
+			std::cout << " Prandtl number                   : " << para.Pr << std::endl;
+			std::cout << " Rayleigh number                  : " << para.Ra << std::endl;
 			std::cout << " CFL number                       : " << para.cfl << std::endl;
 			std::cout << " Maximum time step (1)            : " << para.dtMax << std::endl;
 			std::cout << " Total time (1)                   : " << para.tt << std::endl;
 			std::cout << " EPS                              : " << para.eps << std::endl;
-			std::cout << " Arbitrary parameter Alpha	    : " << para.alpha << std::endl;
-			std::cout << " Arbitrary parameter Beta	        : " << para.beta << std::endl;
+			std::cout << " Arbitrary parameter Alpha        : " << para.alpha << std::endl;
+			std::cout << " Arbitrary parameter Beta         : " << para.beta << std::endl;
 			std::cout << " Reading Para. done " << std::endl;
 			file.close();
 		}
@@ -74,7 +74,7 @@ namespace SIM {
 		}
 
 		R stepGL() {
-			static const R Re = R(1.)*R(1.) / R(para.niu);
+			static const R Re = R(1.) / R(para.Pr);
 			static int counter = 0;
 			static int maxLoop = 1;
 			static R minDt = 0.1* cfl();
@@ -196,7 +196,6 @@ namespace SIM {
 #endif
 			for (int p = 0; p<int(part->np); p++) {
 				if (part->type[p] != BD1) continue;
-				//part->neumann[p] = para.rho* (para.niu* part->lap(part->vel2, p) + para.g)* part->bdnorm.at(p);
 				part->neumann[p] = 0.;
 			}
 		}

@@ -508,6 +508,72 @@ namespace SIM {
 			return ret;
 		}
 
+		const R func_lsA_upwind(const std::vector<R>& phi, const unsigned& p, const Vec& p_new) const {
+			const auto dp = p_new - pos[p];
+#if UPWIND_VEL
+			const auto up = -(phi[p].norm());
+#else
+			const auto up = dp.normalized();
+#endif
+			MatPP mm = MatPP::Zero();
+			VecP vv = VecP::Zero();
+			const auto c = cell->iCoord(pos[p]);
+			for (auto i = 0; i < cell->blockSize::value; i++) {
+				const auto key = cell->hash(c, i);
+				for (auto m = 0; m < cell->linkList[key].size(); m++) {
+					const auto q = cell->linkList[key][m];
+#if NOBD2
+					if (type[q] == BD2) continue;
+#endif
+#if BD_OPT
+					if (bdOpt(p, q)) continue;
+#endif
+					const auto dr = pos[q] - pos[p];
+					if (dr.dot(up) < 0) continue;
+					const auto dr1 = dr.norm();
+					if (dr1 > r0) continue;
+					const auto w = w3(dr1);
+					VecP npq;
+					poly(dr, npq);
+					mm += (w* npq)* npq.transpose();
+					vv += (w* (phi[q] - phi[p]))* npq;
+				}
+			}
+			MatPP inv = MatPP::Zero();
+			if (abs(mm.determinant()) < eps_mat) {
+#if DEBUG
+				std::cout << " ID: " << p << " --- " << " Determinant defficiency: " << mm.determinant() << std::endl;
+#endif
+				auto mm_ = mm.block<2, 2>(0, 0);
+				if (abs(mm_.determinant()) < eps_mat) {
+					//inv = MatPP::Zero();
+					inv = invMat[p];
+				}
+				else inv.block<2, 2>(0, 0) = mm_.inverse();
+			}
+			else inv = mm.inverse();
+
+			const auto a = inv * vv;
+			const auto gd = pn_p_o * a;
+			const auto mgd = pn_pp_o * a;
+			Mat hes;
+			int counter = 0;
+			for (auto i = 0; i < D; i++) {
+				for (auto j = i; j < D; j++) {
+					hes(i, j) = mgd(counter++);
+				}
+			}
+			for (auto i = 0; i < D; i++) {
+				for (auto j = 0; j < i; j++) {
+					hes(i, j) = hes(j, i);
+				}
+			}
+			const auto dpt = dp.transpose();
+			R ret = phi[p];
+			//ret += dpt* gd + 0.5* dpt * hes* dp;
+			return ret;
+		}
+
 		//const Vec func_lsB(const std::vector<Vec>& u, const unsigned& p, const Vec& p_new) const {}
 
 		//const Vec func_lsB_upwind(const std::vector<Vec>& u, const unsigned& p, const Vec& p_new) const {}
