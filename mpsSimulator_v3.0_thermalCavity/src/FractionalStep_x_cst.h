@@ -102,7 +102,7 @@ namespace SIM {
 #pragma omp parallel for
 #endif
 			for (int p = 0; p < int(part->np); p++) {
-				if (part->type[p] == FLUID || part->type == BD1) {
+				if (part->type[p] == FLUID || part->type[p] == BD1) {
 					part->pres[p] = part->phi[p];
 				}
 			}
@@ -163,10 +163,12 @@ namespace SIM {
 			part->b2dirichlet();
 			//part->updateTeam();
 			part->init_x();
+			sen = new Sensor<R, D, Particle_x_cst<R, D, P>>(part);
 		}
 
 	public:
 		Particle_x_cst<R,D,P>* part;
+		Sensor<R,D,Particle_x_cst<R,D,P>>* sen;
 
 	private:
 		__forceinline void makeLhs_v_q2() {
@@ -215,7 +217,7 @@ namespace SIM {
 
 		__forceinline void makeLhs_v_q1() {
 			coef.clear();
-			for (auto p = 0; p < part->np; p++) {
+			for (unsigned p = 0; p < part->np; p++) {
 				if (part->type[p] == BD1 || part->type[p] == BD2) {
 					for (auto d = 0; d < D; d++) {
 						coef.push_back(Tpl(D*p + d, D*p + d, 1.));
@@ -234,7 +236,7 @@ namespace SIM {
 						if (part->bdOpt(p, q)) continue;
 #endif
 						const auto dr = part->pos[q] - part->pos[p];
-						const auto dr1 = dr.mag();
+						const auto dr1 = dr.norm();
 						if (dr1 > part->r0) continue;
 						const auto w = part->w3(dr1);
 						VecP npq;

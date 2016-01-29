@@ -162,7 +162,7 @@ namespace REN {
 		stateObj.m_mvp = stateObj.m_projectionMat * stateObj.m_viewModelMat;
 		stateObj.m_mvpInv = glm::inverse(stateObj.m_mvp);
 
-		renObj->draw(simObj->part->type, simObj->part->pos, simObj->part->vort, simObj->part->pres);
+		renObj->draw(simObj->part->type, simObj->part->pos, simObj->part->vort, simObj->part->temp);
 
 		glutSwapBuffers();
 		glutReportErrors();

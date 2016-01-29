@@ -51,7 +51,7 @@ namespace SIM {
 			derived().init_();
 			mSol = new MatSolver<R, D>(unsigned(derived().part->np), para.eps);
 			std::cout << " Particle number : " << derived().part->np << std::endl;
-			sen << "Sensor.in";
+			*(derived().sen) << "Sensor.in";
 			R tmp = cfl();
 			para.dt = tmp < para.dtMax ? tmp : para.dtMax;
 			timeStep = int(derived().part->ct / para.dt);
@@ -93,7 +93,7 @@ namespace SIM {
 			std::cout << " time --------> " << part->ct << std::endl;
 			std::cout << " dt ----------> " << para.dt << std::endl;
 			counter++;
-			maxLoop = static_cast<int>(0.1* Re / para.dt);
+			maxLoop = static_cast<int>(1.* Re / para.dt);
 			if (counter > maxLoop && para.dt > minDt) {
 				counter = 0;
 				para.cfl /= R(2);
@@ -105,15 +105,13 @@ namespace SIM {
 			static int i = 0;
 			std::ostringstream convert;
 			convert << i++;
-			sen.writeVect(derived().part);
-			sen >> convert.str();
+			*(derived().sen) >> convert.str();
 		}
 
 		void profileOut() {
 			auto* const part = derived().part;
 			static std::string pf = "profile";
-			sen.writeScal(derived().part);
-			sen.profile(rt, pf);
+			derived().sen->profile(rt, pf);
 		}
 
 		void profileOut_avgVel2() {
@@ -152,7 +150,6 @@ namespace SIM {
 		Parameter<R,D> para;
 		MatSolver<R,D>* mSol;
 		Shifter<R,D> shi;
-		Sensor<R,D> sen;
 
 	protected:
 		void step() {}

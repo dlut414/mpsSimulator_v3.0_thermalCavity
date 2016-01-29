@@ -41,7 +41,7 @@ namespace REN {
 			u_width = 1024;
 			u_height = 800;
 			i_visFlag = 1;
-			f_visRange = 1000.f;
+			f_visRange = 1.f;
 
 			m_camera.SetPosition(m_initCameraPosition);
 			m_camera.SetRotation(m_initCameraRotation);
