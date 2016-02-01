@@ -205,8 +205,8 @@ namespace SIM {
 #endif
 			for (int p = 0; p < int(part->np); p++) {
 				part->pres[p] = mSol->x[p];
-				if (part->pres[p] < -1.e5) part->pres[p] = -1.e5;
-				if (part->pres[p] > 1.e5) part->pres[p] = 1.e5;
+				//if (part->pres[p] < -1.e5) part->pres[p] = -1.e5;
+				//if (part->pres[p] > 1.e5) part->pres[p] = 1.e5;
 			}
 		}
 
@@ -218,8 +218,8 @@ namespace SIM {
 #endif
 			for (int p = 0; p < int(part->np); p++) {
 				part->phi[p] = mSol->x[p];
-				if (part->phi[p] < -1.e5) part->phi[p] = -1.e5;
-				if (part->phi[p] > 1.e5) part->phi[p] = 1.e5;
+				//if (part->phi[p] < -1.e5) part->phi[p] = -1.e5;
+				//if (part->phi[p] > 1.e5) part->phi[p] = 1.e5;
 			}
 		}
 

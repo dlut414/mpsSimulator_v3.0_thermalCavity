@@ -111,7 +111,7 @@ namespace REN {
 		if (!stateObj.b_stop) {
 			double t = double(simObj->stepGL());
 			static int count = int(t);
-			if (t - 1.* count >= 0.) {
+			if (t - (10./simObj->para.Ra)* count >= 0.) {
 				stateObj.b_bmp = true;
 				stateObj.b_sens = true;
 				count++;

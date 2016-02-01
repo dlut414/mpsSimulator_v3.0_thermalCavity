@@ -379,7 +379,7 @@ namespace SIM {
 			}
 		}
 
-		template <typename T, typename U>
+		template <typename T, typename U, int LOOP = 5>
 		void shiftSpringIterate(T* const part, const U& para) const {
 			std::vector<Vec> dp(part->np, Vec::Zero());
 			std::vector<Vec> tmp1(part->np, Vec::Zero());
@@ -391,7 +391,7 @@ namespace SIM {
 			for (int p = 0; p<int(part->np); p++) {
 				dp[p] = part->pos[p];
 			}
-			for (int loop = 0; loop < 5; loop++) {
+			for (int loop = 0; loop < LOOP; loop++) {
 #if OMP
 #pragma omp parallel for
 #endif
