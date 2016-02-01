@@ -110,11 +110,12 @@ namespace REN {
 		}
 		if (!stateObj.b_stop) {
 			double t = double(simObj->stepGL());
-			static int count = int(t);
-			if (t - (10./simObj->para.Ra)* count >= 0.) {
+			static double interval = 10. / simObj->para.Ra;
+			static int count = int(simObj->para.dtMax/interval);
+			if (t - interval* count >= 0.) {
 				stateObj.b_bmp = true;
 				stateObj.b_sens = true;
-				count++;
+				count = static_cast<int>(ceil(t/interval));
 			}
 			stateObj.b_dirty = true;
 		}
