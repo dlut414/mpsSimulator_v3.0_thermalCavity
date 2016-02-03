@@ -110,7 +110,7 @@ namespace REN {
 		}
 		if (!stateObj.b_stop) {
 			double t = double(simObj->stepGL());
-			static double interval = 10. / simObj->para.Ra;
+			static double interval = 100. / simObj->para.Ra;
 			static int count = int(simObj->para.dtMax/interval);
 			if (t - interval* count >= 0.) {
 				stateObj.b_bmp = true;
