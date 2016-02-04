@@ -60,13 +60,13 @@ namespace SIM {
 				for (int d = 0; d < D; d++) {
 					file << vel1[p][d] << " ";
 				}
-				file << std::endl;
+				file << temp[p] << std::endl;
 			}
 			std::cout << " Writing Geo. done. " << std::endl;
 			file.close();
 		}
 		void operator << (const std::string str) {
-			int n;	 int t;		vec p;		vec	v;
+			int n;	 int t;		vec p;		vec	v; R tp;
 			std::ifstream file(str);
 			if (!file.is_open()) std::cout << " File Geo. not found ! " << std::endl;
 			file >> ct >> dp >> np >> bd1 >> bd2;
@@ -75,16 +75,17 @@ namespace SIM {
 				file >> t;
 				for (int d = 0; d < D; d++) file >> p[d];
 				for (int d = 0; d < D; d++) file >> v[d];
-				addPart(pType(t), p, v);
+				file >> tp;
+				addPart(pType(t), p, v, tp);
 			}
 			file.close();
 			std::cout << " Reading Geo. done " << std::endl;
 		}
 
-		void addPart (const pType& t, const vec& p, const vec& v) {
+		void addPart (const pType& t, const vec& p, const vec& v, const R& tp) {
 			type.push_back(t);	pos.push_back(p); pos_m1.push_back(p);
 			vel1.push_back(v);	vel2.push_back(v); vel_m1.push_back(v);
-			temp.push_back(0.); pnd.push_back(0.);	pres.push_back(0.);
+			temp.push_back(tp); pnd.push_back(0.);	pres.push_back(0.);
 			pn.push_back(0);	nbd.push_back(0);
 			fs.push_back(0);	team.push_back(0);	
 			phi.push_back(0.); vort.push_back(0.);
