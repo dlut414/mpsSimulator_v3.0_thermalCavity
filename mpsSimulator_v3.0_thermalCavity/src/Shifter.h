@@ -247,6 +247,7 @@ namespace SIM {
 			std::vector<Vec> dp(part->np, Vec::Zero());
 			std::vector<Vec> tmp1(part->np, Vec::Zero());
 			std::vector<Vec> tmp2(part->np, Vec::Zero());
+			std::vector<R> tmp3(part->np, R(0.));
 #if OMP
 #pragma omp parallel for
 #endif
@@ -257,6 +258,7 @@ namespace SIM {
 				dp[p] = part->pos_m1[p];
 				tmp1[p] = part->derived().func_lsA_upwind(part->vel1, p, dp[p]);
 				tmp2[p] = part->derived().func_lsA_upwind(part->vel2, p, dp[p]);
+				tmp3[p] = part->derived().func_lsA_upwind(part->temp, p, dp[p]);
 			}
 #if OMP
 #pragma omp parallel for
@@ -266,6 +268,7 @@ namespace SIM {
 				part->pos[p] = dp[p];
 				part->vel1[p] = tmp1[p];
 				part->vel2[p] = tmp2[p];
+				part->temp[p] = tmp3[p];
 			}
 		}
 
