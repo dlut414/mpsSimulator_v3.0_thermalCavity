@@ -570,7 +570,7 @@ namespace SIM {
 			}
 			const auto dpt = dp.transpose();
 			R ret = phi[p];
-			//ret += dpt* gd + 0.5* dpt * hes* dp;
+			ret = ret + dpt* gd + 0.5* dpt * hes* dp;
 			return ret;
 		}
 
