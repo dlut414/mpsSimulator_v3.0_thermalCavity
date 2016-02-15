@@ -578,6 +578,270 @@ namespace SIM {
 
 		//const Vec func_lsB_upwind(const std::vector<Vec>& u, const unsigned& p, const Vec& p_new) const {}
 
+		template <int StencilsX = 1, int StencilsY = 3, int Stencils = StencilsX*StencilsY, int Dimension = D>	struct interpolateWENO_B_ {
+		};
+		template <int StencilsX, int StencilsY, int Stencils>		struct interpolateWENO_B_<StencilsX, StencilsY, Stencils, 1> {
+			template <typename R> static const R Gen(const std::vector<R>& phi, const unsigned& p, const Vec& p_new, Particle_x_cst<R, D, P>* const part) {}
+			template <typename Vec> static const Vec Gen(const std::vector<Vec>& phi, const unsigned& p, const Vec& p_new, Particle_x_cst<R, D, P>* const part) {}
+		};
+		template <int StencilsX, int StencilsY, int Stencils>		struct interpolateWENO_B_<StencilsX, StencilsY, Stencils, 2> {
+			template <typename R> static const R Gen(const std::vector<R>& phi, const unsigned& p, const Vec& p_new, Particle_x_cst<R, D, P>* const part) {
+				const auto dp = p_new - part->pos[p];
+				if (dp.norm() < part->eps) return phi[p];
+				const auto up = dp.normalized();
+				const auto alpha = 2.* M_PI / StencilsX;
+				Vec dir[StencilsX];
+				Vec ctr[Stencils];
+				for (auto i = 0; i < StencilsX; i++) {
+					const auto theta = i* alpha;
+					const auto ct = cos(theta);
+					const auto st = sin(theta);
+					dir[i] << ct*up[0] + st*up[1], ct*up[1] - st*up[0];
+				}
+				for (auto j = 0; j < StencilsY; j++) {
+					//const auto dis = part->r0* ( R(1.) - R(2.)*(j + 1) / (1 + StencilsY) );
+					const auto dis = part->r0* (R(1.) - R(1.)*(j + 1) / (StencilsY));
+					for (auto i = 0; i < StencilsX; i++) {
+						const auto stcId = i* StencilsY + j;
+						ctr[stcId] = part->pos[p] + dis*dir[i];
+					}
+				}
+				MatPP mm[Stencils];
+				VecP vv[Stencils];
+				for (auto i = 0; i < Stencils; i++) {
+					mm[i] = MatPP::Zero();
+					vv[i] = VecP::Zero();
+				}
+				const auto& cell = part->cell;
+				const auto c = cell->iCoord(part->pos[p]);
+				for (auto i = 0; i < cell->blockSize::value; i++) {
+					const auto key = cell->hash(c, i);
+					for (auto m = 0; m < cell->linkList[key].size(); m++) {
+						const auto q = cell->linkList[key][m];
+#if BD_OPT
+						if (bdOpt(p, q)) continue;
+#endif
+						const auto dr = part->pos[q] - part->pos[p];
+						const auto dr1 = dr.norm();
+						if (dr1 > part->r0) continue;
+						for (auto stcX = 0; stcX < StencilsX; stcX++) {
+							for (auto stcY = 0; stcY < StencilsY; stcY++) {
+								const auto stcId = stcX* StencilsY + stcY;
+								const auto dis = (part->pos[q] - ctr[stcId]).norm();
+								const auto w = part->w3(dis);
+								VecP npq;
+								part->poly(dr, npq);
+								mm[stcId] += (w* npq)* npq.transpose();
+								vv[stcId] += (w* npq)* (phi[q] - phi[p]);
+							}
+						}
+					}
+				}
+				R oscillationIndicator[Stencils];
+				R stencilWeight[Stencils];
+				R stencilWeightNorm[Stencils];
+				VecP polyCoef[Stencils];
+				for (auto i = 0; i < Stencils; i++) {
+					MatPP inv = MatPP::Zero();
+					if (abs(mm[i].determinant()) < part->eps_mat) {
+						return phi[p];
+						auto mm_ = mm[i].block<2, 2>(0, 0);
+						if (abs(mm_.determinant()) < part->eps_mat) {
+							inv = MatPP::Zero();
+						}
+						else inv.block<2, 2>(0, 0) = mm_.inverse();
+					}
+					else inv = mm[i].inverse();
+					polyCoef[i] = inv * vv[i];
+					oscillationIndicator[i] = R(0.);
+				}
+
+				for (auto i = 0; i < Stencils; i++) {
+					const auto dp = part->dp;
+					const auto A = polyCoef[i][0] * polyCoef[i][0];
+					const auto B = polyCoef[i][1] * polyCoef[i][1];
+					const auto C = polyCoef[i][2] * polyCoef[i][2];
+					const auto D = polyCoef[i][3] * polyCoef[i][3];
+					const auto E = polyCoef[i][4] * polyCoef[i][4];
+					const auto beta1 = (dp*dp*dp)*(A + B) + (dp*dp*dp*dp*dp / 6.)*(2.*C + D + 2.*E);
+					const auto beta2 = (dp*dp*dp*dp*dp)*(4.*C + D + 4.*E);
+					//oscillationIndicator[i] = 4.*beta1 - (1. / 3.)*beta2;
+					oscillationIndicator[i] = beta1 + beta2;
+				}
+				const R epsilon = 1.e-6;
+				const int magnifier = 5;
+				for (auto i = 0; i < Stencils; i++) {
+					stencilWeight[i] = 1. / pow(epsilon + oscillationIndicator[i], magnifier);
+				}
+				R stencilWeightSum = R(0.);
+				for (auto i = 0; i < Stencils; i++) {
+					stencilWeightSum += stencilWeight[i];
+				}
+				for (auto i = 0; i < Stencils; i++) {
+					stencilWeightNorm[i] = stencilWeight[i] / stencilWeightSum;
+				}
+				VecP combinedCoef = VecP::Zero();
+				for (auto i = 0; i < Stencils; i++) {
+					combinedCoef += stencilWeightNorm[i] * polyCoef[i];
+				}
+				const auto gd = part->pn_p_o * combinedCoef;
+				const auto mgd = part->pn_pp_o * combinedCoef;
+				Mat hes;
+				int counter = 0;
+				for (auto i = 0; i < D; i++) {
+					for (auto j = i; j < D; j++) {
+						hes(i, j) = mgd(counter++);
+					}
+				}
+				for (auto i = 0; i < D; i++) {
+					for (auto j = 0; j < i; j++) {
+						hes(i, j) = hes(j, i);
+					}
+				}
+				const auto dpt = dp.transpose();
+				auto ret = phi[p];
+				ret = ret + (dpt*gd) + 0.5*dpt * hes * dp;
+				return ret;
+			}
+			template <typename Vec> static const Vec Gen(const std::vector<Vec>& phi, const unsigned& p, const Vec& p_new, Particle_x_cst<R, D, P>* const part) {
+				const auto dp = p_new - part->pos[p];
+				if (dp.norm() < part->eps) return phi[p];
+				const auto up = dp.normalized();
+				const auto alpha = 2.* M_PI / StencilsX;
+				Vec dir[StencilsX];
+				Vec ctr[Stencils];
+				for (auto i = 0; i < StencilsX; i++) {
+					const auto theta = i* alpha;
+					const auto ct = cos(theta);
+					const auto st = sin(theta);
+					dir[i] << ct*up[0] + st*up[1], ct*up[1] - st*up[0];
+				}
+				for (auto j = 0; j < StencilsY; j++) {
+					//const auto dis = part->r0* ( R(1.) - R(2.)*(j + 1) / (1 + StencilsY) );
+					const auto dis = part->r0* (R(1.) - R(1.)*(j + 1) / (StencilsY));
+					for (auto i = 0; i < StencilsX; i++) {
+						const auto stcId = i* StencilsY + j;
+						ctr[stcId] = part->pos[p] + dis*dir[i];
+					}
+				}
+				MatPP mm[Stencils];
+				MatPD vv[Stencils];
+				for (auto i = 0; i < Stencils; i++) {
+					mm[i] = MatPP::Zero();
+					vv[i] = MatPD::Zero();
+				}
+				const auto& cell = part->cell;
+				const auto c = cell->iCoord(part->pos[p]);
+				for (auto i = 0; i < cell->blockSize::value; i++) {
+					const auto key = cell->hash(c, i);
+					for (auto m = 0; m < cell->linkList[key].size(); m++) {
+						const auto q = cell->linkList[key][m];
+#if BD_OPT
+						if (bdOpt(p, q)) continue;
+#endif
+						const auto dr = part->pos[q] - part->pos[p];
+						const auto dr1 = dr.norm();
+						if (dr1 > part->r0) continue;
+						for (auto stcX = 0; stcX < StencilsX; stcX++) {
+							for (auto stcY = 0; stcY < StencilsY; stcY++) {
+								const auto stcId = stcX* StencilsY + stcY;
+								const auto dis = (part->pos[q] - ctr[stcId]).norm();
+								const auto w = part->w3(dis);
+								VecP npq;
+								part->poly(dr, npq);
+								mm[stcId] += (w* npq)* npq.transpose();
+								vv[stcId] += (w* npq)* (phi[q] - phi[p]).transpose();
+							}
+						}
+					}
+				}
+				R oscillationIndicator[D][Stencils];
+				R stencilWeight[D][Stencils];
+				R stencilWeightNorm[D][Stencils];
+				VecP polyCoef[D][Stencils];
+				for (auto d = 0; d < D; d++) {
+					for (auto i = 0; i < Stencils; i++) {
+						MatPP inv = MatPP::Zero();
+						if (abs(mm[i].determinant()) < part->eps_mat) {
+							return phi[p];
+							auto mm_ = mm[i].block<2, 2>(0, 0);
+							if (abs(mm_.determinant()) < part->eps_mat) {
+								inv = MatPP::Zero();
+							}
+							else inv.block<2, 2>(0, 0) = mm_.inverse();
+						}
+						else inv = mm[i].inverse();
+						polyCoef[d][i] = (inv * vv[i]).block<PN::value, 1>(0, d);
+						oscillationIndicator[d][i] = R(0.);
+					}
+				}
+
+				for (auto d = 0; d < D; d++) {
+					for (auto i = 0; i < Stencils; i++) {
+						const auto dp = part->dp;
+						const auto A = polyCoef[d][i][0] * polyCoef[d][i][0];
+						const auto B = polyCoef[d][i][1] * polyCoef[d][i][1];
+						const auto C = polyCoef[d][i][2] * polyCoef[d][i][2];
+						const auto D = polyCoef[d][i][3] * polyCoef[d][i][3];
+						const auto E = polyCoef[d][i][4] * polyCoef[d][i][4];
+						const auto beta1 = (dp*dp*dp)*(A + B) + (dp*dp*dp*dp*dp / 6.)*(2.*C + D + 2.*E);
+						const auto beta2 = (dp*dp*dp*dp*dp)*(4.*C + D + 4.*E);
+						//oscillationIndicator[d][i] = 4.*beta1 - (1. / 3.)*beta2;
+						oscillationIndicator[d][i] = beta1 + beta2;
+					}
+				}
+				const R epsilon = 1.e-6;
+				const int magnifier = 5;
+				for (auto d = 0; d < D; d++) {
+					for (auto i = 0; i < Stencils; i++) {
+						stencilWeight[d][i] = 1. / pow(epsilon + oscillationIndicator[d][i], magnifier);
+					}
+					R stencilWeightSum = R(0.);
+					for (auto i = 0; i < Stencils; i++) {
+						stencilWeightSum += stencilWeight[d][i];
+					}
+					for (auto i = 0; i < Stencils; i++) {
+						stencilWeightNorm[d][i] = stencilWeight[d][i] / stencilWeightSum;
+					}
+				}
+				auto ret = phi[p];
+				for (auto d = 0; d < D; d++) {
+					VecP combinedCoef = VecP::Zero();
+					for (auto i = 0; i < Stencils; i++) {
+						combinedCoef += stencilWeightNorm[d][i] * polyCoef[d][i];
+					}
+					const auto gd = part->pn_p_o * combinedCoef;
+					const auto mgd = part->pn_pp_o * combinedCoef;
+					Mat hes;
+					int counter = 0;
+					for (auto i = 0; i < D; i++) {
+						for (auto j = i; j < D; j++) {
+							hes(i, j) = mgd(counter++);
+						}
+					}
+					for (auto i = 0; i < D; i++) {
+						for (auto j = 0; j < i; j++) {
+							hes(i, j) = hes(j, i);
+						}
+					}
+					const auto dpt = dp.transpose();
+					ret[d] = ret[d] + (dpt*gd) + 0.5*dpt * hes * dp;
+				}
+				return ret;
+			}
+		};
+		template <int StencilsX, int StencilsY, int Stencils>		struct interpolateWENO_B_<StencilsX, StencilsY, Stencils, 3> {
+			template <typename R> static const R Gen(const std::vector<R>& phi, const unsigned& p, const Vec& p_new, Particle_x_cst<R, D, P>* const part) {}
+			template <typename Vec> static const Vec Gen(const std::vector<Vec>& phi, const unsigned& p, const Vec& p_new, Particle_x_cst<R, D, P>* const part) {}
+		};
+
+		__forceinline const R interpolateWENO(const std::vector<R>& phi, const unsigned& p, const Vec& p_new) {
+			return interpolateWENO_B_<>::Gen(phi, p, p_new, this);
+		}
+		__forceinline const Vec interpolateWENO(const std::vector<Vec>& phi, const unsigned& p, const Vec& p_new) {
+			return interpolateWENO_B_<>::Gen(phi, p, p_new, this);
+		}
+
 		void updateInvMat() {
 #if OMP
 #pragma omp parallel for

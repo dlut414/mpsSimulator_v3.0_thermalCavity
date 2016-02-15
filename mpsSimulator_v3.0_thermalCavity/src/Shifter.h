@@ -447,6 +447,36 @@ namespace SIM {
 			}
 		}
 
+		template <typename T, typename U>
+		void shiftStaticWENO(T* const part, const U& para) const {
+			std::vector<Vec> dp(part->np, Vec::Zero());
+			std::vector<Vec> tmp1(part->np, Vec::Zero());
+			std::vector<Vec> tmp2(part->np, Vec::Zero());
+			std::vector<R> tmp3(part->np, R(0.));
+#if OMP
+#pragma omp parallel for
+#endif
+			for (int p = 0; p < int(part->np); p++) {
+				if (part->type[p] != FLUID) continue;
+				if (part->isFs(p)) continue;
+				//dp[p] = part->pos_m1[p] + dp[p];
+				dp[p] = part->pos_m1[p];
+				tmp1[p] = part->derived().interpolateWENO(part->vel1, p, dp[p]);
+				tmp2[p] = part->derived().interpolateWENO(part->vel2, p, dp[p]);
+				tmp3[p] = part->derived().interpolateWENO(part->temp, p, dp[p]);
+			}
+#if OMP
+#pragma omp parallel for
+#endif
+			for (int p = 0; p < int(part->np); p++) {
+				if (part->type[p] != FLUID) continue;
+				part->pos[p] = dp[p];
+				part->vel1[p] = tmp1[p];
+				part->vel2[p] = tmp2[p];
+				part->temp[p] = tmp3[p];
+			}
+		}
+
 	private:
 		inline const R w_spline(const R& r, const R& r0) const {
 			/*cubic spline*/

@@ -1,4 +1,4 @@
-﻿Build started 2016/02/05 18:32:09.
+﻿Build started 2016/02/15 14:38:32.
      1>Project "C:\Users\HU FANGYUAN\Documents\Visual Studio 2013\Projects\mpsSimulator_v3.0_thermalCavity\mpsSimulator_v3.0_thermalCavity\mpsSimulator_v3.0.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Isrc /I..\common /I"..\..\extern\freeglut-2.8.1\include" /I"..\..\extern\glew-1.11.0\include" /I..\..\extern\glm /I..\..\extern\eigen /Zi /nologo /W3 /WX- /sdl /MP /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /openmp /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt mpsSimulator_v3.0.cpp
@@ -12,4 +12,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:11.11
+Time Elapsed 00:00:21.43
