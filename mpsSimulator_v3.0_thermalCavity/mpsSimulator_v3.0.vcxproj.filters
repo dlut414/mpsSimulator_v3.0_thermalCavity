@@ -132,6 +132,9 @@
     <ClInclude Include="src\Particle_x_cst.h">
       <Filter>Header Files\SIM\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="src\FractionalStep_DD.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="renderer\shader0\fragment.glsl">

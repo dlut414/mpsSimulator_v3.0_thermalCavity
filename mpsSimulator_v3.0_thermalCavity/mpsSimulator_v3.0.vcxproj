@@ -184,6 +184,7 @@
     <ClInclude Include="src\BgPart.h" />
     <ClInclude Include="src\ConsValue.h" />
     <ClInclude Include="src\Derivative.h" />
+    <ClInclude Include="src\FractionalStep_DD.h" />
     <ClInclude Include="src\FractionalStep_x.h" />
     <ClInclude Include="src\FractionalStep_x_cst.h" />
     <ClInclude Include="src\Header.h" />

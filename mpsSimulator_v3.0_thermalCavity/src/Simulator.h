@@ -290,7 +290,7 @@ namespace SIM {
 			//shi.shiftPnd(part, para);
 			//shi.shiftXu(derived().part, para);
 			//shi.shiftSpringIterate(derived().part, para);
-			shi.shiftStaticWENO(derived().part, para);
+			shi.shiftStatic(derived().part, para);
 			//shi.shiftNearest2d(derived().part, para);
 			//shi.shiftPndLs(part, para);
 			//shi.shiftLs(part, para);
