@@ -81,7 +81,7 @@ namespace SIM {
 #pragma omp parallel for
 #endif
 			for (int p = 0; p < int(part->np); p++) {
-				if (part->type[p] == FLUID) part->pos[p] += 0.5* para.dt * (part->vel1[p] + part->vel2[p]);
+				if (part->type[p] == FLUID) part->pos[p] += para.dt * part->vel2[p];
 			}
 		}
 
