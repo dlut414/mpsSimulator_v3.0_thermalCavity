@@ -158,7 +158,7 @@ namespace SIM {
 					const auto w = w3(dr1);
 					VecP npq;
 					poly(dr, npq);
-					vv += (w * npq) * (u[q] - [p]);
+					vv += (w * npq) * (u[q] - u[p]).transpose();
 				}
 			}
 			const auto a = invMat[p] * vv;

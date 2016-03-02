@@ -90,7 +90,7 @@ namespace SIM {
 #pragma omp parallel for
 #endif
 			for (int p = 0; p < int(part->np); p++) {
-				part->pres[p] += part->phi[p];
+				if (part->type[p] == FLUID || part->type[p] == BD1) part->pres[p] += part->phi[p];
 			}
 		}
 
@@ -125,7 +125,7 @@ namespace SIM {
 					continue;
 				}
 				R pp = 0.;
-				const R cc = R(0.5)* para.dt* para.Pr;
+				const R coefL = R(0.5)* para.dt* para.Pr;
 				const auto& mm = part->invMat[p];
 				const auto& cell = part->cell;
 				const auto c = cell->iCoord(part->pos[p]);
@@ -144,7 +144,7 @@ namespace SIM {
 						part->poly(dr, npq);
 						const auto a = mm * (w* npq);
 						const auto& lp = part->pn_lap_o;
-						const auto pq = cc* lp.dot(a);
+						const auto pq = coefL* lp.dot(a);
 						pp -= pq;
 						if (q == p) continue;
 						for (auto d = 0; d < D; d++) {
@@ -273,6 +273,7 @@ namespace SIM {
 				MatPP* mm;
 				if (IS(part->bdc[p], T_NEUMANN))	mm = &(part->invNeu.at(p));
 				else								mm = &(part->invMat[p]);
+				const R coefL = -R(0.5)* para.dt;
 				const auto& cell = part->cell;
 				const auto c = cell->iCoord(part->pos[p]);
 				for (auto i = 0; i < cell->blockSize::value; i++) {
@@ -293,14 +294,14 @@ namespace SIM {
 						part->poly(dr, npq);
 						const auto a = (*mm) * (w* npq);
 						const auto& lp = part->pn_lap_o;
-						const auto pq = lp.dot(a);
+						const auto pq = coefL* lp.dot(a);
 						pp -= pq;
 						if (q == p) continue;
 						coef.push_back(Tpl(p, q, pq));
 						pqsum += abs(pq);
 					}
 				}
-				pp += -(1. / para.dt);
+				pp += R(1.);
 				coef.push_back(Tpl(p, p, pp));
 				if (pqsum < para.eps) coef.push_back(Tpl(p, p, 1.));
 			}
@@ -308,7 +309,7 @@ namespace SIM {
 		}
 
 		__forceinline void makeRhs_t_q1() {
-			const auto coefL = -(1. / para.dt);
+			const R coefL = R(0.5)* para.dt;
 #if OMP
 #pragma omp parallel for
 #endif
@@ -321,7 +322,7 @@ namespace SIM {
 					mSol->b[p] = part->t_dirichlet.at(p);
 					continue;
 				}
-				mSol->b[p] = coefL * part->temp[p];
+				mSol->b[p] = part->temp[p] + coefL*part->lap(part->temp, p);
 				if (IS(part->bdc[p], T_NEUMANN)) {
 					VecP inner = VecP::Zero();
 					inner.block<D, 1>(0, 0) = part->bdnorm.at(p);
