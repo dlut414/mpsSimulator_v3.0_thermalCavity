@@ -458,10 +458,10 @@ namespace SIM {
 				}
 				divSum += abs(div);
 			}
-			std::cout << " max vel: " << velMax << " --- id: " << idv << std::endl;
-			std::cout << " max phi: " << phiMax << " --- id: " << idp << std::endl;
-			std::cout << " max Div: " << divMax << " --- id: " << idd << std::endl;
-			std::cout << " avg Div: " << divSum/part->np << std::endl;
+			std::cout << " max vel: " << std::scientific << velMax << " --- id: " << idv << std::endl;
+			std::cout << " max phi: " << std::scientific << phiMax << " --- id: " << idp << std::endl;
+			std::cout << " max Div: " << std::scientific << divMax << " --- id: " << idd << std::endl;
+			std::cout << " avg Div: " << std::scientific << divSum / part->np << std::endl;
 		}
 
 		void insertRand() {

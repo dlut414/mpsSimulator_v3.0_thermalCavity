@@ -9,7 +9,7 @@
 #include "header.h"
 
 #define AUGMENT (1)
-#define AG AUGMENT
+#define AG (1)
 
 namespace SIM {
 

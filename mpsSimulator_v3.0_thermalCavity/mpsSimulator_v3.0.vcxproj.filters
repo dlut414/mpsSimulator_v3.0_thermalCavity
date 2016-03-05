@@ -135,6 +135,18 @@
     <ClInclude Include="src\FractionalStep_DD.h">
       <Filter>Header Files\SIM\Simulator</Filter>
     </ClInclude>
+    <ClInclude Include="src\SIMPLER.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SIMPLE.h">
+      <Filter>Header Files\SIM\Simulator</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MatrixSolver.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SparseMatrix.h">
+      <Filter>Header Files\SIM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="renderer\shader0\fragment.glsl">

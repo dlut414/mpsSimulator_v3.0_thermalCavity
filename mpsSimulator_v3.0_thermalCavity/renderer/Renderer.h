@@ -8,6 +8,7 @@
 #pragma once
 #include <cstdio>
 #include "FractionalStep_x_cst.h"
+#include "SIMPLE.h"
 #include "Header.h"
 #include "Controller.h"
 #include "DrawSim.h"
@@ -19,7 +20,7 @@ struct Parameters {
 	enum { Order = 2, };
 };
 
-typedef SIM::FractionalStep_x_cst<Parameters::DataType, Parameters::Dim, Parameters::Order> Sim;
+typedef SIM::SIMPLE<Parameters::DataType, Parameters::Dim, Parameters::Order> Sim;
 typedef REN::DrawSim<Parameters::DataType, Parameters::Dim> Ren;
 
 Ren* renObj;

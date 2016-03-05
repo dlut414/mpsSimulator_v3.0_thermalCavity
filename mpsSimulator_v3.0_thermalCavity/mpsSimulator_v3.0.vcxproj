@@ -189,6 +189,7 @@
     <ClInclude Include="src\FractionalStep_x_cst.h" />
     <ClInclude Include="src\Header.h" />
     <ClInclude Include="src\LinkCell.h" />
+    <ClInclude Include="src\MatrixSolver.h" />
     <ClInclude Include="src\MatSolver.h" />
     <ClInclude Include="src\Mls_2d_i.h" />
     <ClInclude Include="src\Mls_2d_i_cst.h" />
@@ -204,6 +205,9 @@
     <ClInclude Include="src\Particle_x.h" />
     <ClInclude Include="src\Particle_x_cst.h" />
     <ClInclude Include="src\Polynomial.h" />
+    <ClInclude Include="src\SIMPLE.h" />
+    <ClInclude Include="src\SIMPLER.h" />
+    <ClInclude Include="src\SparseMatrix.h" />
     <ClInclude Include="src\_Polynomial.h" />
     <ClInclude Include="src\Sensor.h" />
     <ClInclude Include="src\Shifter.h" />
