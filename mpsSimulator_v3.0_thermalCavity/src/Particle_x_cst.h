@@ -411,7 +411,7 @@ namespace SIM {
 #endif
 				auto mm_ = mm.block<2, 2>(0, 0);
 				if (abs(mm_.determinant()) < eps_mat) {
-					inv = MatPP::Zero();
+					return phi[p];
 				}
 				else inv.block<2, 2>(0, 0) = mm_.inverse();
 			}
@@ -478,8 +478,7 @@ namespace SIM {
 #endif
 				auto mm_ = mm.block<2, 2>(0, 0);
 				if (abs(mm_.determinant()) < eps_mat) {
-					//inv = MatPP::Zero();
-					inv = invMat[p];
+					return phi[p];
 				}
 				else inv.block<2, 2>(0, 0) = mm_.inverse();
 			}
@@ -546,8 +545,7 @@ namespace SIM {
 #endif
 				auto mm_ = mm.block<2, 2>(0, 0);
 				if (abs(mm_.determinant()) < eps_mat) {
-					//inv = MatPP::Zero();
-					inv = invMat[p];
+					return phi[p];
 				}
 				else inv.block<2, 2>(0, 0) = mm_.inverse();
 			}
