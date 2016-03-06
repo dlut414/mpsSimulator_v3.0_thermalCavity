@@ -20,7 +20,7 @@ struct Parameters {
 	enum { Order = 2, };
 };
 
-typedef SIM::SIMPLE<Parameters::DataType, Parameters::Dim, Parameters::Order> Sim;
+typedef SIM::FractionalStep_x_cst<Parameters::DataType, Parameters::Dim, Parameters::Order> Sim;
 typedef REN::DrawSim<Parameters::DataType, Parameters::Dim> Ren;
 
 Ren* renObj;
