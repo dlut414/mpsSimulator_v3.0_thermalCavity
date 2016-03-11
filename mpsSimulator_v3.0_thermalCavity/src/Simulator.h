@@ -55,6 +55,7 @@ namespace SIM {
 			R tmp = cfl();
 			para.dt = tmp < para.dtMax ? tmp : para.dtMax;
 			timeStep = int(derived().part->ct / para.dt);
+			insertRand();
 		}
 
 		void mainLoop() {
@@ -466,13 +467,19 @@ namespace SIM {
 
 		void insertRand() {
 			auto* const part = derived().part;
-			R coef = 0.1;
+			R coef = 0.25;
 			std::default_random_engine gen;
 			std::normal_distribution<R> dis(0., 0.5);
-			for (auto p = 0; p < part->np; p++) {
+			for (int p = 0; p < int(part->np); p++) {
 				if (part->type[p] != FLUID) continue;
-				vec dr = coef* part->dp* vec(dis(gen), 0., dis(gen));
-				part->pos[p] += dr;
+				const R dr = coef* part->dp* dis(gen);
+				const R theta = 2.* M_PI * (R(rand()) / RAND_MAX);
+				const R dx = cos(theta)*dr;
+				const R dy = sin(theta)*dr;
+				part->pos[p][0] += dx;
+				part->pos[p][1] += dy;
+				part->pos_m1[p][0] += dx;
+				part->pos_m1[p][1] += dy;
 			}
 		}
 
