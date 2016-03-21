@@ -55,7 +55,7 @@ namespace SIM {
 			R tmp = cfl();
 			para.dt = tmp < para.dtMax ? tmp : para.dtMax;
 			timeStep = int(derived().part->ct / para.dt);
-			insertRand();
+			//insertRand();
 		}
 
 		void mainLoop() {
