@@ -61,7 +61,7 @@ namespace SIM {
 		void operator << (const std::string& str) {
 			std::ifstream file(str);
 			if (!file.is_open()) std::cout << " No file Sensor. file ! " << std::endl;
-			pos.clear();	vel.clear();	pres.clear();	gd.clear();
+			pos.clear();	vel.clear();	pres.clear();
 			while (file.good()) {
 				Vec p;
 				for (auto d = 0; d < D; d++) {
